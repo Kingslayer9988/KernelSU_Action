@@ -12,26 +12,6 @@ jobs:
       CCACHE_HARDLINK: "true"
     steps:
     - uses: actions/checkout@v4
-    
-    # Step: Setup ccache
-    - name: Setup ccache
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.ccache
-        key: ${{ runner.os }}-ccache-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-ccache-
-
-    - name: Configure ccache environment
-      run: |
-        sudo apt-get install -y ccache
-        ccache -z
-        echo "export PATH=/usr/lib/ccache:$PATH" >> $GITHUB_ENV
-
-    - name: Check ccache statistics
-      run: ccache -s
-
     - name: Prepare Configuration
       run: |
         CONFIG_ENV=$(grep -w "CONFIG_ENV" config.env | head -n 1 | cut -d "=" -f 2)
@@ -218,9 +198,6 @@ jobs:
             echo "FORMAT_MKBOOTING=$(echo `tools/unpack_bootimg.py --boot_img=boot-source.img --format mkbootimg`)" >> $GITHUB_ENV
             echo "HAVE_SOURCE_BOOT_IMAGE=true" >> $GITHUB_ENV
         fi
-    
-    - name: Save ccache statistics
-      run: ccache -s
 
     - name: Setup KernelSU
       if: env.ENABLE_KERNELSU == 'true'
